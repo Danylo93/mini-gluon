@@ -620,12 +620,12 @@ async def generate_project(request: ProjectRequest):
         if request.language not in TEMPLATES or request.template_id not in TEMPLATES[request.language]:
             raise HTTPException(status_code=400, detail=f"Template {request.template_id} not found for language {request.language}")
         
-        # Get GitHub user
-        user = github_client.get_user(request.github_username)
+        # Get authenticated user (the token owner)
+        auth_user = github_client.get_user()
         
         # Create repository
         repo_name = request.name.lower().replace(" ", "-").replace("_", "-")
-        repo = user.create_repo(
+        repo = auth_user.create_repo(
             name=repo_name,
             description=request.description,
             private=False,
