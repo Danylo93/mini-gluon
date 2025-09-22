@@ -676,6 +676,10 @@ async def generate_project(request: ProjectRequest):
 async def get_projects():
     """Get all generated projects"""
     projects = await db.projects.find().to_list(1000)
+    # Convert ObjectId to string for JSON serialization
+    for project in projects:
+        if '_id' in project:
+            project['_id'] = str(project['_id'])
     return {"projects": projects}
 
 
