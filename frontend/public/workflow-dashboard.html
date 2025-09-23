@@ -1,0 +1,626 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🚀 Scaffold Forge - Workflow Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .dashboard {
+            max-width: 1400px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 30px;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            margin-bottom: 10px;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.3);
+        }
+
+        .header p {
+            font-size: 1.2rem;
+            opacity: 0.9;
+        }
+
+        .workflows-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .workflow-card {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .workflow-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
+        }
+
+        .workflow-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #4CAF50, #2196F3, #FF9800, #F44336, #9C27B0);
+        }
+
+        .workflow-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .workflow-icon {
+            font-size: 2rem;
+            margin-right: 15px;
+        }
+
+        .workflow-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .workflow-status {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: bold;
+            margin-left: auto;
+        }
+
+        .status-running {
+            background: #E3F2FD;
+            color: #1976D2;
+            animation: pulse 2s infinite;
+        }
+
+        .status-success {
+            background: #E8F5E8;
+            color: #2E7D32;
+        }
+
+        .status-failed {
+            background: #FFEBEE;
+            color: #C62828;
+        }
+
+        .status-pending {
+            background: #FFF3E0;
+            color: #F57C00;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
+
+        .workflow-progress {
+            margin: 15px 0;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #E0E0E0;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #4CAF50, #45a049);
+            border-radius: 4px;
+            transition: width 0.3s ease;
+            animation: shimmer 2s infinite;
+        }
+
+        @keyframes shimmer {
+            0% { background-position: -200px 0; }
+            100% { background-position: calc(200px + 100%) 0; }
+        }
+
+        .workflow-steps {
+            margin-top: 15px;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid #F0F0F0;
+        }
+
+        .step:last-child {
+            border-bottom: none;
+        }
+
+        .step-icon {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 0.8rem;
+        }
+
+        .step-completed {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .step-running {
+            background: #2196F3;
+            color: white;
+            animation: pulse 1s infinite;
+        }
+
+        .step-pending {
+            background: #E0E0E0;
+            color: #666;
+        }
+
+        .step-failed {
+            background: #F44336;
+            color: white;
+        }
+
+        .step-name {
+            flex: 1;
+            font-size: 0.9rem;
+            color: #555;
+        }
+
+        .step-time {
+            font-size: 0.8rem;
+            color: #888;
+        }
+
+        .logs-section {
+            background: white;
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+            margin-top: 20px;
+        }
+
+        .logs-header {
+            display: flex;
+            justify-content: between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .logs-title {
+            font-size: 1.3rem;
+            font-weight: bold;
+            color: #333;
+        }
+
+        .logs-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: background 0.3s ease;
+        }
+
+        .btn-primary {
+            background: #2196F3;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #1976D2;
+        }
+
+        .btn-secondary {
+            background: #E0E0E0;
+            color: #333;
+        }
+
+        .btn-secondary:hover {
+            background: #BDBDBD;
+        }
+
+        .logs-container {
+            background: #1E1E1E;
+            color: #D4D4D4;
+            padding: 15px;
+            border-radius: 8px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            max-height: 400px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+        }
+
+        .log-line {
+            margin: 2px 0;
+            padding: 2px 0;
+        }
+
+        .log-info { color: #4CAF50; }
+        .log-warning { color: #FF9800; }
+        .log-error { color: #F44336; }
+        .log-debug { color: #9C27B0; }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+
+        .metric-card {
+            background: white;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+
+        .metric-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #2196F3;
+            margin-bottom: 5px;
+        }
+
+        .metric-label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        .connection-lines {
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            pointer-events: none;
+            z-index: -1;
+        }
+
+        .connection-line {
+            position: absolute;
+            height: 2px;
+            background: linear-gradient(90deg, #4CAF50, #2196F3);
+            opacity: 0.3;
+            animation: flow 3s infinite;
+        }
+
+        @keyframes flow {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <div class="header">
+            <h1>🚀 Scaffold Forge</h1>
+            <p>Workflow Dashboard - Monitoramento em Tempo Real</p>
+        </div>
+
+        <div class="workflows-grid">
+            <!-- CI/CD Pipeline -->
+            <div class="workflow-card" id="ci-workflow">
+                <div class="workflow-header">
+                    <div class="workflow-icon">🚀</div>
+                    <div class="workflow-title">CI/CD Pipeline</div>
+                    <div class="workflow-status status-running" id="ci-status">Executando</div>
+                </div>
+                <div class="workflow-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="ci-progress" style="width: 75%"></div>
+                    </div>
+                </div>
+                <div class="workflow-steps">
+                    <div class="step">
+                        <div class="step-icon step-completed">✓</div>
+                        <div class="step-name">Checkout code</div>
+                        <div class="step-time">2s</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon step-completed">✓</div>
+                        <div class="step-name">Setup JDK</div>
+                        <div class="step-time">5s</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon step-running">⟳</div>
+                        <div class="step-name">Run tests</div>
+                        <div class="step-time">15s</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon step-pending">⏳</div>
+                        <div class="step-name">Build package</div>
+                        <div class="step-time">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Scan -->
+            <div class="workflow-card" id="security-workflow">
+                <div class="workflow-header">
+                    <div class="workflow-icon">🔒</div>
+                    <div class="workflow-title">Security Scan</div>
+                    <div class="workflow-status status-pending" id="security-status">Aguardando</div>
+                </div>
+                <div class="workflow-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="security-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="workflow-steps">
+                    <div class="step">
+                        <div class="step-icon step-pending">⏳</div>
+                        <div class="step-name">OWASP Dependency Check</div>
+                        <div class="step-time">-</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon step-pending">⏳</div>
+                        <div class="step-name">CodeQL Analysis</div>
+                        <div class="step-time">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Code Quality -->
+            <div class="workflow-card" id="quality-workflow">
+                <div class="workflow-header">
+                    <div class="workflow-icon">🎯</div>
+                    <div class="workflow-title">Code Quality</div>
+                    <div class="workflow-status status-pending" id="quality-status">Aguardando</div>
+                </div>
+                <div class="workflow-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="quality-progress" style="width: 0%"></div>
+                    </div>
+                </div>
+                <div class="workflow-steps">
+                    <div class="step">
+                        <div class="step-icon step-pending">⏳</div>
+                        <div class="step-name">SonarQube Analysis</div>
+                        <div class="step-time">-</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon step-pending">⏳</div>
+                        <div class="step-name">SpotBugs Check</div>
+                        <div class="step-time">-</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Dependency Update -->
+            <div class="workflow-card" id="dependabot-workflow">
+                <div class="workflow-header">
+                    <div class="workflow-icon">🔄</div>
+                    <div class="workflow-title">Dependency Update</div>
+                    <div class="workflow-status status-success" id="dependabot-status">Concluído</div>
+                </div>
+                <div class="workflow-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="dependabot-progress" style="width: 100%"></div>
+                    </div>
+                </div>
+                <div class="workflow-steps">
+                    <div class="step">
+                        <div class="step-icon step-completed">✓</div>
+                        <div class="step-name">Check dependencies</div>
+                        <div class="step-time">3s</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon step-completed">✓</div>
+                        <div class="step-name">Create PR</div>
+                        <div class="step-time">2s</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Release -->
+            <div class="workflow-card" id="release-workflow">
+                <div class="workflow-header">
+                    <div class="workflow-icon">🚀</div>
+                    <div class="workflow-title">Release</div>
+                    <div class="workflow-status status-failed" id="release-status">Falhou</div>
+                </div>
+                <div class="workflow-progress">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="release-progress" style="width: 60%"></div>
+                    </div>
+                </div>
+                <div class="workflow-steps">
+                    <div class="step">
+                        <div class="step-icon step-completed">✓</div>
+                        <div class="step-name">Build release</div>
+                        <div class="step-time">8s</div>
+                    </div>
+                    <div class="step">
+                        <div class="step-icon step-failed">✗</div>
+                        <div class="step-name">Create release</div>
+                        <div class="step-time">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="logs-section">
+            <div class="logs-header">
+                <div class="logs-title">📋 Logs em Tempo Real</div>
+                <div class="logs-controls">
+                    <button class="btn btn-primary" onclick="startSimulation()">▶️ Iniciar Simulação</button>
+                    <button class="btn btn-secondary" onclick="clearLogs()">🗑️ Limpar</button>
+                </div>
+            </div>
+            <div class="logs-container" id="logs-container">
+                <div class="log-line log-info">[INFO] 🚀 Scaffold Forge Dashboard iniciado</div>
+                <div class="log-line log-info">[INFO] 📊 Conectando aos workflows...</div>
+                <div class="log-line log-success">[SUCCESS] ✅ Conexão estabelecida com GitHub Actions</div>
+                <div class="log-line log-info">[INFO] 🔄 Monitorando 5 workflows ativos</div>
+            </div>
+        </div>
+
+        <div class="metrics-grid">
+            <div class="metric-card">
+                <div class="metric-value" id="total-workflows">5</div>
+                <div class="metric-label">Workflows Ativos</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="success-rate">80%</div>
+                <div class="metric-label">Taxa de Sucesso</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="avg-time">2m 15s</div>
+                <div class="metric-label">Tempo Médio</div>
+            </div>
+            <div class="metric-card">
+                <div class="metric-value" id="builds-today">12</div>
+                <div class="metric-label">Builds Hoje</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let simulationInterval;
+        let logCounter = 0;
+
+        function addLog(message, type = 'info') {
+            const logsContainer = document.getElementById('logs-container');
+            const timestamp = new Date().toLocaleTimeString();
+            const logLine = document.createElement('div');
+            logLine.className = `log-line log-${type}`;
+            logLine.textContent = `[${timestamp}] ${message}`;
+            logsContainer.appendChild(logLine);
+            logsContainer.scrollTop = logsContainer.scrollHeight;
+        }
+
+        function updateWorkflowStatus(workflowId, status, progress) {
+            const statusElement = document.getElementById(`${workflowId}-status`);
+            const progressElement = document.getElementById(`${workflowId}-progress`);
+            
+            statusElement.className = `workflow-status status-${status}`;
+            statusElement.textContent = getStatusText(status);
+            
+            if (progressElement) {
+                progressElement.style.width = `${progress}%`;
+            }
+        }
+
+        function getStatusText(status) {
+            const statusTexts = {
+                'running': 'Executando',
+                'success': 'Concluído',
+                'failed': 'Falhou',
+                'pending': 'Aguardando'
+            };
+            return statusTexts[status] || status;
+        }
+
+        function startSimulation() {
+            if (simulationInterval) {
+                clearInterval(simulationInterval);
+            }
+
+            addLog('🎬 Iniciando simulação de workflows...', 'info');
+            
+            // Simular execução dos workflows
+            setTimeout(() => {
+                updateWorkflowStatus('security', 'running', 30);
+                addLog('🔒 Security Scan iniciado', 'info');
+            }, 1000);
+
+            setTimeout(() => {
+                updateWorkflowStatus('quality', 'running', 45);
+                addLog('🎯 Code Quality analysis iniciado', 'info');
+            }, 2000);
+
+            setTimeout(() => {
+                updateWorkflowStatus('ci', 'success', 100);
+                addLog('✅ CI/CD Pipeline concluído com sucesso', 'success');
+            }, 3000);
+
+            setTimeout(() => {
+                updateWorkflowStatus('security', 'success', 100);
+                addLog('✅ Security Scan concluído - 0 vulnerabilidades encontradas', 'success');
+            }, 5000);
+
+            setTimeout(() => {
+                updateWorkflowStatus('quality', 'success', 100);
+                addLog('✅ Code Quality analysis concluído - Quality Gate passou', 'success');
+            }, 6000);
+
+            // Simular logs contínuos
+            simulationInterval = setInterval(() => {
+                const logMessages = [
+                    '📊 Coletando métricas de performance...',
+                    '🔍 Verificando dependências...',
+                    '🧪 Executando testes unitários...',
+                    '📦 Gerando artefatos de build...',
+                    '🚀 Preparando deploy...',
+                    '✅ Validação de qualidade concluída',
+                    '📈 Atualizando dashboard...'
+                ];
+                
+                const randomMessage = logMessages[Math.floor(Math.random() * logMessages.length)];
+                addLog(randomMessage, 'info');
+            }, 2000);
+        }
+
+        function clearLogs() {
+            document.getElementById('logs-container').innerHTML = '';
+            addLog('🗑️ Logs limpos', 'info');
+        }
+
+        // Inicializar dashboard
+        document.addEventListener('DOMContentLoaded', function() {
+            addLog('🎯 Dashboard carregado com sucesso', 'success');
+            addLog('📡 Conectando aos workflows do GitHub Actions...', 'info');
+            
+            // Simular conexão
+            setTimeout(() => {
+                addLog('✅ Conexão estabelecida com todos os workflows', 'success');
+                addLog('🔄 Monitoramento ativo - 5 workflows detectados', 'info');
+            }, 1000);
+        });
+    </script>
+</body>
+</html>

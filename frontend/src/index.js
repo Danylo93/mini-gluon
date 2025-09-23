@@ -10,13 +10,18 @@ root.render(
     <App />
     <Toaster 
       position="top-right"
+      expand={true}
+      richColors={true}
+      closeButton={true}
       toastOptions={{
-        duration: 4000,
+        duration: 5000,
         style: {
-          background: 'white',
-          border: '1px solid #e2e8f0',
+          background: 'hsl(var(--background))',
+          border: '1px solid hsl(var(--border))',
           borderRadius: '8px',
-        }
+          color: 'hsl(var(--foreground))',
+        },
+        className: 'toast-custom',
       }}
     />
   </React.StrictMode>,

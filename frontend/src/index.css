@@ -84,3 +84,40 @@ code {
     @apply bg-background text-foreground;
     }
 }
+
+/* Custom toast styles */
+.toast-custom {
+  @apply shadow-lg;
+}
+
+.toast-custom[data-type="success"] {
+  @apply border-green-200 bg-green-50 text-green-900;
+}
+
+.dark .toast-custom[data-type="success"] {
+  @apply border-green-800 bg-green-900/20 text-green-100;
+}
+
+.toast-custom[data-type="error"] {
+  @apply border-red-200 bg-red-50 text-red-900;
+}
+
+.dark .toast-custom[data-type="error"] {
+  @apply border-red-800 bg-red-900/20 text-red-100;
+}
+
+.toast-custom[data-type="warning"] {
+  @apply border-yellow-200 bg-yellow-50 text-yellow-900;
+}
+
+.dark .toast-custom[data-type="warning"] {
+  @apply border-yellow-800 bg-yellow-900/20 text-yellow-100;
+}
+
+.toast-custom[data-type="info"] {
+  @apply border-blue-200 bg-blue-50 text-blue-900;
+}
+
+.dark .toast-custom[data-type="info"] {
+  @apply border-blue-800 bg-blue-900/20 text-blue-100;
+}
